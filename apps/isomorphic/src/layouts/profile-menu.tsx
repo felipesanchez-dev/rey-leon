@@ -45,7 +45,7 @@ export default function ProfileMenu({
         };
         const user = {
           id: json.id.toString(),
-          username: json.username || 'Sin nombre',
+          username: json.username || 'Sin nombre', 
           name: json.name || 'Sin nombre',
           email: json.email || 'Sin email',
           positionJob: json.positionJob || 'Sin rol',
