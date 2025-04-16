@@ -10,14 +10,14 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 días
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async session({ session, token }) {
       return {
         ...session,
         user: token.user as typeof session.user,
-        jwt: token.jwt as string, // jwt a la sesión
+        jwt: token.jwt as string,
       };
     },
     async jwt({ token, user }) {
@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
         token.user = user;
         token.idToken = user.id;
         if ('jwt' in user && typeof user.jwt === 'string') {
-          token.jwt = user.jwt; // guardar el jwt
+          token.jwt = user.jwt;
         }
       }
       return token;
@@ -41,17 +41,31 @@ export const authOptions: NextAuthOptions = {
       credentials: {},
       async authorize(credentials: any) {
         try {
-          const res = await fetch('https://reyleonback.s.cloudesarrollosmoyan.com/api/auth/local', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              identifier: credentials?.email,
-              password: credentials?.password,
-            }),
-          });
+          if (!credentials?.identifier || !credentials?.password) {
+            throw new Error('Faltan las credenciales');
+          }
+
+          const temporaryToken =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzQ0ODMxNDAxLCJleHAiOjE3NDc0MjM0MDF9.K9Uv8jzk5VGC4U8UG8qldKiNWgHMbf57zD2W8it_HGw'; // Cambia esto por un token seguro
+
+          const res = await fetch(
+            'https://reyleonback.s.cloudesarrollosmoyan.com/api/auth/local',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${temporaryToken}`,
+              },
+              body: JSON.stringify({
+                identifier: credentials.identifier,
+                password: credentials.password,
+              }),
+            }
+          );
 
           if (!res.ok) {
-            return null;
+            console.error('Error en la autenticación:', await res.text());
+            throw new Error('Credenciales inválidas');
           }
 
           const data = (await res.json()) as { jwt?: string; user?: any };
@@ -66,14 +80,13 @@ export const authOptions: NextAuthOptions = {
             };
           }
 
-          return null;
+          throw new Error('Respuesta inválida de la API');
         } catch (error) {
           console.error('Error en authorize:', error);
           return null;
         }
       },
     }),
-    
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID || '',
       clientSecret: env.GOOGLE_CLIENT_SECRET || '',

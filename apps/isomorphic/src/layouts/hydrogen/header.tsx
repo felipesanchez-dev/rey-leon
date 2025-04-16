@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import HamburgerButton from '@/layouts/hamburger-button';
 import Sidebar from '@/layouts/hydrogen/sidebar';

@@ -5,7 +5,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 export default function Logo({ iconOnly = false, ...props }: IconProps) {
   return (
     <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="350px" height="90px" viewBox="0 0 13318.000000 6098.000000"
+ width="250px" height="120px" viewBox="0 0 13318.000000 6098.000000"
  preserveAspectRatio="xMidYMid meet">
 <metadata>
 Rey Leon

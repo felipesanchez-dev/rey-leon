@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; 
 import { signIn } from 'next-auth/react';
 import { SubmitHandler } from 'react-hook-form';
 import { PiArrowRightBold } from 'react-icons/pi';
@@ -8,19 +9,33 @@ import { Form } from '@core/ui/form';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
 
 const initialValues: LoginSchema = {
-  email: '',
+  identifier: '',
   password: '',
   rememberMe: true,
 };
 
 export default function SignInForm() {
   const [reset, setReset] = useState({});
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const onSubmit: SubmitHandler<LoginSchema> = (data) => {
-    console.log(data);
-    signIn('credentials', {
-      ...data,
-    });
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+    try {
+      setError(null);
+      const result = await signIn('credentials', {
+        ...data,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        router.push('/');
+      } else {
+        setError(result?.error || 'Error desconocido al iniciar sesión');
+      }
+    } catch (err) {
+      setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+      console.error('Error en el inicio de sesión:', err);
+    }
   };
 
   return (
@@ -42,12 +57,12 @@ export default function SignInForm() {
               placeholder="Ingrese su email"
               className="[&>label>span]:font-medium"
               inputClassName="text-sm"
-              {...register('email')}
-              error={errors.email?.message}
+              {...register('identifier')}
+              error={errors.identifier?.message}
             />
             <Password
               label="Contraseña"
-              placeholder="Enter your password"
+              placeholder="Ingrese su contraseña"
               size="lg"
               className="[&>label>span]:font-medium"
               inputClassName="text-sm"
@@ -65,10 +80,15 @@ export default function SignInForm() {
               <span>Iniciar sesión</span>{' '}
               <PiArrowRightBold className="ms-2 mt-0.5 h-5 w-5" />
             </Button>
+
+            {error && (
+              <div className="mt-4 rounded-md bg-red-100 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
           </div>
         )}
       </Form>
-      
     </>
   );
 }
