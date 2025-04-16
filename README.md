@@ -1,46 +1,195 @@
-# Isomorphic - React.js Next.js Admin Dashboard
+'use client';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { SubmitHandler } from 'react-hook-form';
+import { PiArrowRightBold } from 'react-icons/pi';
+import { Checkbox, Password, Button, Input, Text } from 'rizzui';
+import { Form } from '@core/ui/form';
+import { loginSchema, LoginSchema } from '@/validators/login.schema';
 
-This monorepo is powered by [Turborepo](https://turbo.build/), a tool that optimizes build times for monorepo projects. Turborepo leverages your existing package.json scripts and dependencies, making it easy to set up and use.
+const initialValues: LoginSchema = {
+  identifier: '',
+  password: '',
+  rememberMe: true,
+};
 
-## Getting Started
+export default function SignInForm() {
+  const [reset, setReset] = useState({});
+  const [error, setError] = useState<string | null>(null);
 
-System Requirements:
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+    try {
+      setError(null);
+      const result = await signIn('credentials', {
+        ...data,
+        redirect: false,
+      });
 
-- [Node.js 20.16.0](https://nodejs.org/en) or later.
-- [Turborepo 2.1.1](https://turbo.build/repo/docs/getting-started/installation)
-- [pnpm - package manager 9.9.0](https://pnpm.io/installation#using-npm) (recommended). We used this version. But you can change it as you want. Learn more about [Turborepo packageManager](https://turbo.build/repo/docs/getting-started/support-policy)
+      if (!result?.ok) {
+        setError(result?.error || 'Error desconocido al iniciar sesión');
+      }
+    } catch (err) {
+      setError('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
+      console.error('Error en el inicio de sesión:', err);
+    }
+  };
 
-**Tuborepo**: For quick install just run the following command it will install turbo in your system globally.
+  return (
+    <>
+      <Form<LoginSchema>
+        validationSchema={loginSchema}
+        resetValues={reset}
+        onSubmit={onSubmit}
+        useFormProps={{
+          defaultValues: initialValues,
+        }}
+      >
+        {({ register, formState: { errors } }) => (
+          <div className="space-y-5">
+            <Input
+              type="email"
+              size="lg"
+              label="Email"
+              placeholder="Ingrese su email"
+              className="[&>label>span]:font-medium"
+              inputClassName="text-sm"
+              {...register('identifier')}
+              error={errors.identifier?.message}
+            />
+            <Password
+              label="Contraseña"
+              placeholder="Ingrese su contraseña"
+              size="lg"
+              className="[&>label>span]:font-medium"
+              inputClassName="text-sm"
+              {...register('password')}
+              error={errors.password?.message}
+            />
+            <div className="flex items-center justify-between pb-2">
+              <Checkbox
+                {...register('rememberMe')}
+                label="Recordar"
+                className="[&>label>span]:font-medium"
+              />
+            </div>
+            <Button className="w-full" type="submit" size="lg">
+              <span>Iniciar sesión</span>{' '}
+              <PiArrowRightBold className="ms-2 mt-0.5 h-5 w-5" />
+            </Button>
 
-```bash
-npm install -g turbo
-```
+            {error && (
+              <div className="mt-4 rounded-md bg-red-100 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+      </Form>
+    </>
+  );
+}
 
-## Starting development server
 
-#### Setup environment variables in every workspace `.env` file. You can find the `.env.example` file in the root of every workspace.
 
-To start the development server locally run the following commands
 
-```bash
-pnpm install
 
-pnpm run dev
 
-```
 
-To build locally and view the local build run the following commands.
 
-```bash
-pnpm run build
 
-pnpm run start
+import { type NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import { env } from '@/env.mjs';
+import { pagesOptions } from './pages-options';
 
-```
+export const authOptions: NextAuthOptions = {
+  pages: {
+    ...pagesOptions,
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  callbacks: {
+    async session({ session, token }) {
+      return {
+        ...session,
+        user: token.user as typeof session.user,
+        jwt: token.jwt as string,
+      };
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+        token.idToken = user.id;
+        if ('jwt' in user && typeof user.jwt === 'string') {
+          token.jwt = user.jwt;
+        }
+      }
+      return token;
+    },
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+  },
+  providers: [
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {},
+      async authorize(credentials: any) {
+        try {
+          if (!credentials?.identifier || !credentials?.password) {
+            throw new Error('Faltan las credenciales');
+          }
 
-**You can find more commands in the project root `package.json` file.**
-To learn more about these commands checkout our [**Documentation**](https://isomorphic-doc.vercel.app/getting-started/installation)
+          const temporaryToken =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzQ0ODMxNDAxLCJleHAiOjE3NDc0MjM0MDF9.K9Uv8jzk5VGC4U8UG8qldKiNWgHMbf57zD2W8it_HGw'; // Cambia esto por un token seguro
 
-In your monorepo's root directory, there is a `turbo.json` file. This file allows you to configure custom tasks, set global dependencies, set environment variables, and more. [**Learn More about Turborepo**](https://turbo.build/repo/docs/handbook)
+          const res = await fetch(
+            'https://reyleonback.s.cloudesarrollosmoyan.com/api/auth/local',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${temporaryToken}`,
+              },
+              body: JSON.stringify({
+                identifier: credentials.identifier,
+                password: credentials.password,
+              }),
+            }
+          );
 
-Happy coding! 🚀
+          if (!res.ok) {
+            console.error('Error en la autenticación:', await res.text());
+            throw new Error('Credenciales inválidas');
+          }
+
+          const data = (await res.json()) as { jwt?: string; user?: any };
+
+          if (data?.jwt && data?.user) {
+            return {
+              id: data.user.id,
+              name: data.user.username || data.user.name,
+              email: data.user.email,
+              jwt: data.jwt,
+              ...data.user,
+            };
+          }
+
+          throw new Error('Respuesta inválida de la API');
+        } catch (error) {
+          console.error('Error en authorize:', error);
+          return null;
+        }
+      },
+    }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID || '',
+      clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+      allowDangerousEmailAccountLinking: true,
+    }),
+  ],
+};
