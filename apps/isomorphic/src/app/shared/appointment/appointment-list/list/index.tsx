@@ -12,7 +12,6 @@ import { Box } from 'rizzui';
 
 export default function AppointmentListTable() {
   const { data: session } = useSession();
-
   const { table, setData } = useTanStackTable({
     tableData: [],
     columnConfig: appointmentColumns,
@@ -51,6 +50,7 @@ export default function AppointmentListTable() {
         const json = (await res.json()) as { data: any[] };
 
         const formattedData = json.data.map((item) => ({
+          documentId: item.documentId || 'Sin documento',
           id: item.id.toString(),
           patient: {
             name: item.responsible || 'Sin nombre',
@@ -64,7 +64,8 @@ export default function AppointmentListTable() {
             )}.webp`,
           },
           type: item.typeContract || 'Sin tipo',
-          date: item.dateStart || '',
+          dateRegister: item.dateRegister || '',
+          datedateStart: item.dateStart || '',
           status: item.state || 'Scheduled',
           amount: Number(item.advance || 0),
           duration: 60,

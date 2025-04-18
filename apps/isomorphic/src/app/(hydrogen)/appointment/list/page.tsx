@@ -1,6 +1,6 @@
 import { metaObject } from '@/config/site.config';
 import AppointmentListPageHeader from './page-header';
-import AppointmentListStats from '@/app/shared/appointment/appointment-list/stats';
+// import AppointmentListStats from '@/app/shared/appointment/appointment-list/stats';
 import AppointmentListTable from '@/app/shared/appointment/appointment-list/list';
 
 export const metadata = {
@@ -10,7 +10,7 @@ export const metadata = {
 export default function AppointmentListPage() {
   return (
     <>
-      <AppointmentListPageHeader /> 
+      <AppointmentListPageHeader />
       <div className="space-y-10 @container">
         {/* <AppointmentListStats /> */}
         <AppointmentListTable />

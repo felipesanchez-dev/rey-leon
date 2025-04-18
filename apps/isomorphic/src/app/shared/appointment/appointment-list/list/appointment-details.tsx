@@ -43,48 +43,58 @@ export default function AppointmentDetails({
           Contrato - {data?.doctor?.name} - ID {data?.id}
         </Title>
         <Text className="mb-5 leading-relaxed">
-          El presente contrato celebrado con la entidad <span className='font-bold'>{data?.doctor?.name}</span>
-          {' '}tiene como objeto la prestación del servicio de tipo <span className='font-bold'>{data?.type}</span>
+          El presente contrato celebrado con la entidad{' '}
+          <span className="font-bold">{data?.doctor?.name}</span> tiene como
+          objeto la prestación del servicio de tipo{' '}
+          <span className="font-bold">{data?.type}</span>
         </Text>
-        {/* <Text className="mb-5 leading-relaxed">
-          The passage experienced a surge in popularity during the 1960s when
-          Letraset used it on their dry-transfer sheets, and again during the
-          90s as desktop publishers bundled the text with their software. Learn
-          more at www.ictexpo.com
-        </Text> */}
+
         <ul className="mt-7 space-y-4 text-xs sm:text-sm">
           <li className="flex items-center">
-            <PiCalendarCheckLight className="me-2 hidden w-5 shrink-0 text-xl" />
-            Fecha de inicio:{' '}
-            <span className="font-bold">
-            {dayjs(data?.dateStart).format('DD MMM, YYYY')}
-          </span>
-          </li>
-          {/* <li className="flex items-center">
-            <PiCalendarCheckLight className="me-2 hidden w-5 shrink-0 text-xl" />
-            Fecha Final:{' '}
-            <span className="ps-2 font-medium text-gray-1000">
-              {dayjs(data?.dateEnd)
-                .add(data?.duration! / 60, 'h')
-                .format('DD MMM, YYYY h:mm A')}
-            </span>
-          </li> */}
-          <li className="flex items-center">
             <PiMapPinLight className="me-2 hidden w-5 shrink-0 text-xl" />
-              Zona:{' '}
+            Zona:{' '}
             <span className="ps-2 font-medium text-gray-1000">
               {data?.address}
             </span>
           </li>
+
+          <li className="flex items-center">
+            <PiMapPinLight className="me-2 hidden w-5 shrink-0 text-xl" />
+            Entidad:{' '}
+            <span className="ps-2 font-medium text-gray-1000">
+              {data?.doctor?.name}
+            </span>
+          </li>
+          <li className="flex items-center">
+            <PiMapPinLight className="me-2 hidden w-5 shrink-0 text-xl" />
+            Responsable:{' '}
+            <span className="ps-2 font-medium text-gray-1000">
+              {data?.patient?.name}
+            </span>
+          </li>
+          <li className="flex items-center">
+            <PiMapPinLight className="me-2 hidden w-5 shrink-0 text-xl" />
+            Tipo de contrato:{' '}
+            <span className="ps-2 font-medium text-gray-1000">
+              {data?.type}
+            </span>
+          </li>
+          <li className="flex items-center">
+            <PiMapPinLight className="me-2 hidden w-5 shrink-0 text-xl" />
+            Estado:{' '}
+            <span className="ps-2 font-medium text-gray-1000">
+              {data?.status}
+            </span>
+          </li>
         </ul>
         <div className="mt-7 flex justify-end gap-3">
-          <Button
+          {/* <Button
             variant="outline"
             className="min-w-[80px]"
             onClick={() => onEdit()}
           >
             Editar
-          </Button>
+          </Button> */}
           <Button
             variant="solid"
             className="min-w-[80px]"

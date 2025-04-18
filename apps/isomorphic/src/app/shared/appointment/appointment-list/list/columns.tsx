@@ -9,6 +9,7 @@ import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import { AppointmentDataType } from '.';
 import CreateUpdateAppointmentForm from '../appointment-form';
 import AppointmentDetails from './appointment-details';
+import { useSession } from 'next-auth/react';
 
 const statusOptions = [
   { label: 'Waiting', value: 'Waiting' },
@@ -19,33 +20,15 @@ const columnHelper = createColumnHelper<AppointmentDataType>();
 
 export const appointmentColumns = [
   columnHelper.display({
-    id: 'select',
-    size: 30,
-    header: ({ table }) => (
-      <Checkbox
-        aria-label="Select all rows"
-        checked={table.getIsAllPageRowsSelected()}
-        onChange={() => table.toggleAllPageRowsSelected()}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        checked={row.getIsSelected()}
-        onChange={() => row.toggleSelected()}
-      />
-    ),
-  }),
-  columnHelper.display({
     id: 'serialNo',
-    size: 100,
+    size: 50,
     header: 'ID',
-    cell: ({ row }) => <Text>#{row.original.id}</Text>,
+    cell: ({ row }) => <Text>{row.original.id}</Text>,
   }),
- 
+
   columnHelper.accessor('doctor.name', {
     id: 'doctorName',
-    size: 270,
+    size: 210,
     header: 'Entidad',
     enableSorting: false,
     cell: ({ row: { original } }) => (
@@ -58,7 +41,7 @@ export const appointmentColumns = [
   }),
   columnHelper.accessor('patient.name', {
     id: 'patientName',
-    size: 230,
+    size: 190,
     header: 'Responsable',
     enableSorting: false,
     cell: ({ row: { original } }) => (
@@ -89,9 +72,10 @@ export const appointmentColumns = [
     size: 150,
     header: 'Estado',
     cell: ({ row }) => (
-<Text className="whitespace-nowrap font-medium text-gray-900">
+      <Text className="whitespace-nowrap font-medium text-gray-900">
         {row.original.status}
-      </Text>    ),
+      </Text>
+    ),
   }),
   columnHelper.display({
     id: 'actions',
@@ -118,13 +102,31 @@ function AppointmentListActions({
   onDelete: () => void;
 }) {
   const { openModal, closeModal } = useModal();
-  function handleCreateModal() {
-    closeModal(),
-      openModal({
-        view: <CreateUpdateAppointmentForm />,
-        customSize: 700,
-      });
+  const { data: session } = useSession();
+
+  async function handleDelete() {
+    try {
+      const response = await fetch(
+        `https://reyleonback.s.cloudesarrollosmoyan.com/api/client-contracts/${row.documentId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${(session as any)?.jwt}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar el contrato');
+      }
+
+      onDelete();
+    } catch (error) {
+      console.error('Error eliminando el contrato:', error);
+      alert('Hubo un error al intentar eliminar el contrato.');
+    }
   }
+
   return (
     <Flex align="center" justify="end" gap="3" className="pe-3">
       <Tooltip
@@ -145,7 +147,13 @@ function AppointmentListActions({
                 <AppointmentDetails
                   data={row}
                   onDelete={onDelete}
-                  onEdit={handleCreateModal}
+                  onEdit={() => {
+                    closeModal();
+                    openModal({
+                      view: <CreateUpdateAppointmentForm />,
+                      customSize: 700,
+                    });
+                  }}
                 />
               ),
               customSize: 900,
@@ -158,7 +166,7 @@ function AppointmentListActions({
       <DeletePopover
         title={`Eliminar contrato`}
         description={`¿Está seguro de que desea eliminar este contrato #${row.id}?`}
-        onDelete={onDelete}
+        onDelete={handleDelete}
       />
     </Flex>
   );
