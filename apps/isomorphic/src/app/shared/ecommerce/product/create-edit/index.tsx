@@ -16,10 +16,10 @@ import ProductMedia from '@/app/shared/ecommerce/product/create-edit/product-med
 import PricingInventory from '@/app/shared/ecommerce/product/create-edit/pricing-inventory';
 import ProductIdentifiers from '@/app/shared/ecommerce/product/create-edit/product-identifiers';
 import ShippingInfo from '@/app/shared/ecommerce/product/create-edit/shipping-info';
-import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
-import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
-import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
-import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
+// import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
+// import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
+// import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
+// import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
 import FormFooter from '@core/components/form-footer';
 import {
   CreateProductInput,
@@ -34,10 +34,10 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.pricingInventory]: PricingInventory,
   [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
-  [formParts.seo]: ProductSeo,
-  [formParts.deliveryEvent]: DeliveryEvent,
-  [formParts.variantOptions]: ProductVariants,
-  [formParts.tagsAndCategory]: ProductTaxonomies,
+  // [formParts.seo]: ProductSeo,
+  // [formParts.deliveryEvent]: DeliveryEvent,
+  // [formParts.variantOptions]: ProductVariants,
+  // [formParts.tagsAndCategory]: ProductTaxonomies,
 };
 
 interface IndexProps {

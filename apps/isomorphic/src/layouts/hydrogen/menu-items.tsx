@@ -62,10 +62,7 @@ import { FaCarSide } from "react-icons/fa";
 import { PiUsersThreeBold } from "react-icons/pi";
 import { CiHome } from "react-icons/ci";
 import { FaUserShield } from "react-icons/fa";
-
-
-
-
+import { BiSolidCarMechanic } from 'react-icons/bi';
 
 // Note: do not add href in the label object, it is rendering as label
 export const menuItems = [
@@ -76,27 +73,31 @@ export const menuItems = [
   },
 
   {
-    name: 'Opciones Administrador',
+    name: 'Principal',
   },
   {
-    name: 'Roles & Usuarios',
+    name: 'Usuarios',
     href: '#',
     icon: <FaUserShield />,
     dropdownItems: [
       {
-        name: 'Gestionar Usuarios & Roles',
+        name: 'Usuarios',
         href: routes.rolesPermissions,
         // icon: <FaUserShield />,
       },
       {
-        name: 'Tarjetas de Roles',
+        name: 'Roles',
         href: routes.widgets.cards,
         icon: <PiSquaresFourDuotone />,
       },
     ],
   },
+
   {
-    name: 'Gestionar Terceros',
+    name: 'Empresa',
+  },
+  {
+    name: 'Empresa',
     href: '#',
     icon: <FaUserShield />,
     dropdownItems: [
@@ -106,9 +107,82 @@ export const menuItems = [
         icon: <PiShapesDuotone />,
       },
       {
+        name: 'Contratos',
+        href: routes.jobBoard.dashboard,
+        icon: <PiShapesDuotone />,
+      },
+      {
         name: 'Crear Contrato',
         href: routes.appointment.appointmentList,
         icon: <PiUsersThreeBold />,
+      },
+    ],
+  },
+  {
+    name: 'Gestiones',
+  },
+  {
+    name: 'Gestion de terceros',
+    href: '#',
+    icon: <FaUserShield />,
+    dropdownItems: [
+      {
+        name: 'Todos los clientes',
+        href: routes.jobBoard.dashboard,
+        icon: <PiShapesDuotone />,
+      },
+      {
+        name: 'Proovedores',
+        href: routes.jobBoard.dashboard,
+        icon: <PiShapesDuotone />,
+      },
+      {
+        name: 'Proopietarios',
+        href: routes.appointment.appointmentList,
+        icon: <PiUsersThreeBold />,
+      },
+    ],
+  },
+  {
+    name: 'Gestion de Vehículos',
+  },
+  {
+    name: 'Vehículos',
+    href: '#',
+    icon: <FaCarSide />,
+    dropdownItems: [
+      {
+        name: 'Todos los Vehículos',
+        href: routes.eCommerce.products,
+        badge: '',
+      },
+      // {
+      //   name: 'Product Details',
+      //   href: routes.eCommerce.productDetails(DUMMY_ID),
+      // },
+      {
+        name: 'Crear nuevo',
+        href: routes.eCommerce.createProduct,
+      },
+      {
+        name: 'Editar',
+        href: routes.eCommerce.products,
+      },
+      // {
+      //   name: 'Mantenimiento Preventivo',
+      //   href: routes.eCommerce.categories,
+      // },
+    ],
+  },
+  {
+    name: ' Mantenimientos',
+    href: '#',
+    icon: <BiSolidCarMechanic />,
+    dropdownItems: [
+      {
+        name: 'Mantenimiento Preventivo',
+        href: routes.eCommerce.categories,
+        badge: '',
       },
     ],
   },
@@ -188,74 +262,74 @@ export const menuItems = [
   //   badge: 'NEW',
   // },
 
-  {
-    name: 'Vehículos',
-    href: '#',
-    icon: <FaCarSide />,
-    dropdownItems: [
-      {
-        name: 'Todos los Vehículos',
-        href: routes.eCommerce.products,
-        badge: '',
-      },
-      // {
-      //   name: 'Product Details',
-      //   href: routes.eCommerce.productDetails(DUMMY_ID),
-      // },
-      {
-        name: 'Crear nuevo vehículo',
-        href: routes.eCommerce.createProduct,
-      },
-      {
-        name: 'Editar vehiculo',
-        href: routes.eCommerce.products,
-      },
-      {
-        name: 'Mantenimiento Preventivo',
-        href: routes.eCommerce.categories,
-      },
-      // {
-      //   name: 'Create Category',
-      //   href: routes.eCommerce.createCategory,
-      // },
-      // {
-      //   name: 'Edit Category',
-      //   href: routes.eCommerce.editCategory(DUMMY_ID),
-      // },
-      // {
-      //   name: 'Orders',
-      //   href: routes.eCommerce.orders,
-      // },
-      // {
-      //   name: 'Order Details',
-      //   href: routes.eCommerce.orderDetails(DUMMY_ID),
-      // },
-      // {
-      //   name: 'Create Order',
-      //   href: routes.eCommerce.createOrder,
-      // },
-      // {
-      //   name: 'Edit Order',
-      //   href: routes.eCommerce.editOrder(DUMMY_ID),
-      // },
-      // {
-      //   name: 'Reviews',
-      //   href: routes.eCommerce.reviews,
-      // },
-      // {
-      //   name: 'Shop',
-      //   href: routes.eCommerce.shop,
-      // },
-      // {
-      //   name: 'Cart',
-      //   href: routes.eCommerce.cart,
-      // },
-      // {
-      //   name: 'Checkout & Payment',
-      //   href: routes.eCommerce.checkout,
-      // },
-    ],
-  },
+  // {
+  //   name: 'Vehículos',
+  //   href: '#',
+  //   icon: <FaCarSide />,
+  //   dropdownItems: [
+  //     {
+  //       name: 'Todos los Vehículos',
+  //       href: routes.eCommerce.products,
+  //       badge: '',
+  //     },
+  //     // {
+  //     //   name: 'Product Details',
+  //     //   href: routes.eCommerce.productDetails(DUMMY_ID),
+  //     // },
+  //     {
+  //       name: 'Crear nuevo vehículo',
+  //       href: routes.eCommerce.createProduct,
+  //     },
+  //     {
+  //       name: 'Editar vehiculo',
+  //       href: routes.eCommerce.products,
+  //     },
+  //     {
+  //       name: 'Mantenimiento Preventivo',
+  //       href: routes.eCommerce.categories,
+  //     },
+  //     // {
+  //     //   name: 'Create Category',
+  //     //   href: routes.eCommerce.createCategory,
+  //     // },
+  //     // {
+  //     //   name: 'Edit Category',
+  //     //   href: routes.eCommerce.editCategory(DUMMY_ID),
+  //     // },
+  //     // {
+  //     //   name: 'Orders',
+  //     //   href: routes.eCommerce.orders,
+  //     // },
+  //     // {
+  //     //   name: 'Order Details',
+  //     //   href: routes.eCommerce.orderDetails(DUMMY_ID),
+  //     // },
+  //     // {
+  //     //   name: 'Create Order',
+  //     //   href: routes.eCommerce.createOrder,
+  //     // },
+  //     // {
+  //     //   name: 'Edit Order',
+  //     //   href: routes.eCommerce.editOrder(DUMMY_ID),
+  //     // },
+  //     // {
+  //     //   name: 'Reviews',
+  //     //   href: routes.eCommerce.reviews,
+  //     // },
+  //     // {
+  //     //   name: 'Shop',
+  //     //   href: routes.eCommerce.shop,
+  //     // },
+  //     // {
+  //     //   name: 'Cart',
+  //     //   href: routes.eCommerce.cart,
+  //     // },
+  //     // {
+  //     //   name: 'Checkout & Payment',
+  //     //   href: routes.eCommerce.checkout,
+  //     // },
+  //   ],
+  // },
   // {
   //   name: 'Support',
   //   href: '#',
