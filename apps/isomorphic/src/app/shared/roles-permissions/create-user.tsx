@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+interface UserCreateModalProps {
+  onClose: () => void;
+}
 
 declare module 'next-auth' {
   interface Session {
@@ -9,22 +16,22 @@ declare module 'next-auth' {
   }
 }
 
-interface UserCreateModalProps {
-  onClose: () => void;
-}
-
 export default function UserCreateModal({ onClose }: UserCreateModalProps) {
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [roles, setRoles] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(false);
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     name: '',
-    firsName: '',
+    firstName: '',
     typeDocument: '',
     numberDocument: '',
     phone: '',
@@ -35,9 +42,6 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
     city: '',
     role: '',
   });
-
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -62,31 +66,28 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
         setRoles(data?.roles || []);
       } catch (err) {
         console.error('Error al cargar roles:', err);
-        setErrorMessage('No se pudieron cargar los roles.');
+        toast.error('No se pudieron cargar los roles.');
       } finally {
         setLoadingRoles(false);
       }
     };
 
-    if (session?.jwt) {
-      fetchRoles();
-    }
+    if (session?.jwt) fetchRoles();
   }, [session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(null);
 
     try {
       if (!formData.role || isNaN(Number(formData.role))) {
-        setErrorMessage('Por favor, selecciona un rol válido.');
+        toast.error('Por favor, selecciona un rol válido.');
         setLoading(false);
         return;
       }
 
       if (!session || !(session as any).jwt) {
-        setErrorMessage('No estás autenticado. Por favor, inicia sesión.');
+        toast.error('No estás autenticado. Por favor, inicia sesión.');
         setLoading(false);
         return;
       }
@@ -110,20 +111,16 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error('Respuesta del servidor:', result);
-        const errorResult = result as { message?: string };
-        throw new Error(errorResult.message || 'Error al crear usuario');
+        throw new Error(
+          (result as { message?: string })?.message || 'Error al crear usuario'
+        );
       }
 
-      console.log(
-        'Usuario creado:',
-        result,
-        'Recuerda siempre revisar la informacion creada, puede que hallas cometido un error'
-      );
+      toast.success('Usuario creado con éxito');
       onClose();
+      router.refresh(); // Recarga los datos sin recargar toda la página
     } catch (error: any) {
-      console.error('Error:', error);
-      setErrorMessage(error.message || 'Ocurrió un error al crear el usuario.');
+      toast.error(error.message || 'Ocurrió un error al crear el usuario.');
     } finally {
       setLoading(false);
     }
@@ -133,12 +130,11 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
-        !(modalRef.current as any).contains(event.target)
+        !modalRef.current.contains(event.target as Node)
       ) {
         onClose();
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose]);
@@ -146,12 +142,114 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
   if (status === 'loading') return <p>Cargando sesión...</p>;
   if (!session) return <p>No estás autenticado. Por favor, inicia sesión.</p>;
 
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <>
+            {[
+              ['username', 'Nombre de usuario'],
+              ['email', 'Correo electrónico'],
+              ['password', 'Contraseña', 'password'],
+              ['name', 'Nombre completo'],
+              ['firstName', 'Primer nombre'],
+            ].map(([name, label, type = 'text']) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-gray-700">
+                  {label}
+                </label>
+                <input
+                  type={type}
+                  name={name}
+                  value={(formData as any)[name]}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 w-full rounded-md border px-3 py-2 shadow-sm"
+                />
+              </div>
+            ))}
+          </>
+        );
+      case 2:
+        return (
+          <>
+            {[
+              ['typeDocument', 'Tipo de documento'],
+              ['numberDocument', 'Número de documento'],
+              ['phone', 'Teléfono'],
+              ['address', 'Dirección'],
+              ['city', 'Ciudad'],
+            ].map(([name, label]) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-gray-700">
+                  {label}
+                </label>
+                <input
+                  type="text"
+                  name={name}
+                  value={(formData as any)[name]}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 w-full rounded-md border px-3 py-2 shadow-sm"
+                />
+              </div>
+            ))}
+          </>
+        );
+      case 3:
+        return (
+          <>
+            {[
+              ['sectorCategory', 'Categoría del sector'],
+              ['supplierType', 'Tipo de proveedor'],
+              ['positionJob', 'Rol en empresa'],
+            ].map(([name, label]) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-gray-700">
+                  {label}
+                </label>
+                <input
+                  type="text"
+                  name={name}
+                  value={(formData as any)[name]}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 w-full rounded-md border px-3 py-2 shadow-sm"
+                />
+              </div>
+            ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Rol
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                required
+                className="mt-1 w-full rounded-md border px-3 py-2 shadow-sm"
+              >
+                <option value="" disabled>
+                  Selecciona un rol
+                </option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        );
+    }
+  };
+
   return (
-    <div
-      ref={modalRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
-    >
-      <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div
+        ref={modalRef}
+        className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg"
+      >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">Crear nuevo usuario</h2>
           <button
@@ -162,93 +260,44 @@ export default function UserCreateModal({ onClose }: UserCreateModalProps) {
           </button>
         </div>
 
-        {errorMessage && (
-          <div className="mb-4 rounded-md bg-red-100 p-2 text-red-700">
-            {errorMessage}
-          </div>
-        )}
-
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 gap-4 md:grid-cols-2"
         >
-          {[
-            ['username', 'Nombre de usuario'],
-            ['email', 'Correo electrónico'],
-            ['password', 'Contraseña', 'password'],
-            ['name', 'Nombre completo'],
-            ['firsName', 'Primer nombre'],
-            ['typeDocument', 'Tipo de documento'],
-            ['numberDocument', 'Número de documento'],
-            ['phone', 'Teléfono'],
-            ['address', 'Dirección'],
-            ['sectorCategory', 'Categoría del sector'],
-            ['supplierType', 'Tipo de proveedor'],
-            ['city', 'Ciudad'],
-          ].map(([name, label, type = 'text']) => (
-            <div key={name}>
-              <label
-                htmlFor={name}
-                className="block text-sm font-medium text-gray-700"
+          {renderStep()}
+          <div className="col-span-full mt-4 flex justify-between gap-3">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                className="rounded-md border border-gray-400 px-4 py-2 text-gray-700 hover:bg-gray-100"
               >
-                {label}
-              </label>
-              <input
-                type={type}
-                id={name}
-                name={name}
-                value={(formData as any)[name]}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          ))}
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Rol en Empresa
-            </label>
-            {loadingRoles ? (
-              <p className="text-sm text-gray-500">Cargando roles...</p>
-            ) : (
-              <select
-                name="role"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-800 focus:border-blue-500 focus:outline-none"
-                value={formData.role}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>
-                  Selecciona un rol
-                </option>
-                {roles.map((role: any) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
+                Anterior
+              </button>
             )}
-          </div>
-
-          <div className="col-span-full mt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-gray-400 px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`rounded-md px-4 py-2 text-white ${loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'}`}
-            >
-              {loading ? 'Creando...' : 'Crear Usuario'}
-            </button>
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s + 1)}
+                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              >
+                Siguiente
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading}
+                className={`rounded-md px-4 py-2 text-white ${
+                  loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {loading ? 'Creando...' : 'Crear Usuario'}
+              </button>
+            )}
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 }
