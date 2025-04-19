@@ -1,252 +1,179 @@
 'use client';
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { SubmitHandler, Controller } from 'react-hook-form';
-import SelectLoader from '@core/components/loader/select-loader';
-import QuillLoader from '@core/components/loader/quill-loader';
-import { Button, Input, Select, Text, Title } from 'rizzui';
-import cn from '@core/utils/class-names';
+import { useState, useEffect } from 'react';
+import { SubmitHandler } from 'react-hook-form';
+import { z } from 'zod';
+import { Button, Input, Select, Title, Text } from 'rizzui';
 import { Form } from '@core/ui/form';
-import {
-  CategoryFormInput,
-  categoryFormSchema,
-} from '@/validators/create-category.schema';
-import UploadZone from '@core/ui/file-upload/upload-zone';
+import { Controller, useForm } from 'react-hook-form';
 
-// const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
-//   ssr: false,
-//   loading: () => <SelectLoader />,
-// });
+const priorityOptions = [
+  { value: 'Baja', label: 'Baja' },
+  { value: 'Media', label: 'Media' },
+  { value: 'Alta', label: 'Alta' },
+];
 
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
+const providers = [
+  { value: 'TOYOTA', label: 'TOYOTA' },
+  { value: 'FERRARI', label: 'FERRARI' },
+  { value: 'RENAULT', label: 'RENAULT' },
+];
+
+const incidenceFormSchema = z.object({
+  descriptionFailure: z
+    .string()
+    .nonempty('La descripción de la falla es obligatoria'),
+  dateReport: z.string().nonempty('La fecha del reporte es obligatoria'),
+  priority: z.enum(['Baja', 'Media', 'Alta'], {
+    required_error: 'La prioridad es obligatoria',
+  }),
+  providerMechanical: z.enum(['TOYOTA', 'FERRARI', 'RENAULT'], {
+    required_error: 'El proveedor mecánico es obligatorio',
+  }),
+  state: z.boolean().optional(),
 });
 
-// Parent category option
-const parentCategoryOption = [
-  {
-    value: 'fruits',
-    label: 'Fruits',
-  },
-  {
-    value: 'grocery',
-    label: 'Grocery',
-  },
-  {
-    value: 'meat',
-    label: 'Meat',
-  },
-  {
-    value: 'cat food',
-    label: 'Cat Food',
-  },
-];
-
-// Type option
-const typeOption = [
-  {
-    value: 'fresh vegetables',
-    label: 'Fresh Vegetables',
-  },
-  {
-    value: 'diet foods',
-    label: 'Diet Foods',
-  },
-  {
-    value: 'green vegetables',
-    label: 'Green Vegetables',
-  },
-];
-
-// a reusable form wrapper component
-function HorizontalFormBlockWrapper({
-  title,
-  description,
-  children,
-  className,
-  isModalView = true,
-}: React.PropsWithChildren<{
-  title: string;
-  description?: string;
-  className?: string;
-  isModalView?: boolean;
-}>) {
-  return (
-    <div
-      className={cn(
-        className,
-        isModalView ? '@5xl:grid @5xl:grid-cols-6' : ' '
-      )}
-    >
-      {isModalView && (
-        <div className="col-span-2 mb-6 pe-4 @5xl:mb-0">
-          <Title as="h6" className="font-semibold">
-            {title}
-          </Title>
-          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
-        </div>
-      )}
-
-      <div
-        className={cn(
-          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
-          isModalView ? 'col-span-4' : ' '
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// main category form component for create and update category
-export default function CreateCategory({
-  id,
-  category,
-  isModalView = true,
-}: {
-  id?: string;
-  isModalView?: boolean;
-  category?: CategoryFormInput;
-}) {
-  const [reset, setReset] = useState({});
+export default function EditIncidenceForm({ incidence }: { incidence?: any }) {
   const [isLoading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<CategoryFormInput> = (data) => {
-    // set timeout ony required to display loading state of the create category button
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: incidence || {},
+  });
+
+  useEffect(() => {
+    if (incidence) {
+      setValue('descriptionFailure', incidence.descriptionFailure);
+      setValue('dateReport', incidence.dateReport);
+      setValue('priority', incidence.priority);
+      setValue('providerMechanical', incidence.providerMechanical);
+      setValue('state', incidence.state);
+    }
+  }, [incidence, setValue]);
+
+  const onSubmit = (data: {
+    descriptionFailure: string;
+    dateReport: string;
+    priority: 'Baja' | 'Media' | 'Alta';
+    providerMechanical: 'TOYOTA' | 'FERRARI' | 'RENAULT';
+    state?: boolean;
+  }) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      console.log('createCategory data ->', data);
-      setReset({
-        name: '',
-        slug: '',
-        type: '',
-        parentCategory: '',
-        description: '',
-        images: '',
-      });
+      console.log('Form data:', data);
     }, 600);
   };
 
   return (
-    <Form<CategoryFormInput>
-      validationSchema={categoryFormSchema}
-      resetValues={reset}
-      onSubmit={onSubmit}
-      useFormProps={{
-        mode: 'onChange',
-        defaultValues: category,
-      }}
-      className="isomorphic-form flex flex-grow flex-col @container"
+    <Form
+      validationSchema={incidenceFormSchema}
+      onSubmit={handleSubmit(onSubmit)}
+      className="isomorphic-form flex flex-col gap-6"
     >
-      {({ register, control, getValues, setValue, formState: { errors } }) => (
+      {() => (
         <>
-          <div className="flex-grow pb-10">
-            <div
-              className={cn(
-                'grid grid-cols-1',
-                isModalView
-                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
-                  : 'gap-5'
-              )}
-            >
-              <HorizontalFormBlockWrapper
-                title={'Add new category:'}
-                description={'Edit your category information from here'}
-                isModalView={isModalView}
-              >
-                <Input
-                  label="Category Name"
-                  placeholder="category name"
-                  {...register('name')}
-                  error={errors.name?.message}
-                />
-                <Input
-                  label="Slug"
-                  placeholder="slug"
-                  {...register('slug')}
-                  error={errors.slug?.message}
-                />
-                <Controller
-                  name="parentCategory"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      dropdownClassName="!z-0"
-                      options={parentCategoryOption}
-                      value={value}
-                      onChange={onChange}
-                      label="Parent Category"
-                      error={errors?.parentCategory?.message as string}
-                      getOptionValue={(option) => option.label}
-                    />
-                  )}
-                />
-                <Controller
-                  name="type"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      dropdownClassName="!z-0"
-                      options={typeOption}
-                      value={value}
-                      onChange={onChange}
-                      label="Display Type"
-                      error={errors?.type?.message as string}
-                      getOptionValue={(option) => option.label}
-                    />
-                  )}
-                />
+          <div>
+            <Title as="h4" className="mb-2 font-semibold">
+              Incidencia
+            </Title>
+            <Text className="mb-4 text-sm text-gray-500">
+              datos requeridos de la incidencia.
+            </Text>
 
-                <div className="col-span-2">
-                  <Controller
-                    control={control}
-                    name="description"
-                    render={({ field: { onChange, value } }) => (
-                      <QuillEditor
-                        value={value}
-                        onChange={onChange}
-                        label="Description"
-                        className="[&>.ql-container_.ql-editor]:min-h-[100px]"
-                        labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
-                      />
-                    )}
-                  />
-                </div>
-              </HorizontalFormBlockWrapper>
-              <HorizontalFormBlockWrapper
-                title="Upload new thumbnail image"
-                description="Upload your product image gallery here"
-                isModalView={isModalView}
-              >
-                <UploadZone
-                  name="images"
-                  getValues={getValues}
-                  setValue={setValue}
-                  className="col-span-full"
+            <Input
+              label="Descripción de la falla"
+              placeholder="Ej: Se quedó sin bomba de gasolina"
+              {...register('descriptionFailure')}
+              error={
+                typeof errors.descriptionFailure?.message === 'string'
+                  ? errors.descriptionFailure.message
+                  : undefined
+              }
+            />
+
+            <Input
+              label="Fecha del reporte"
+              type="date"
+              {...register('dateReport')}
+              error={
+                typeof errors.descriptionFailure?.message === 'string'
+                  ? errors.descriptionFailure.message
+                  : undefined
+              }
+            />
+
+            <Controller
+              name="priority"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  label="Prioridad"
+                  options={priorityOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={
+                    typeof errors.descriptionFailure?.message === 'string'
+                      ? errors.descriptionFailure.message
+                      : undefined
+                  }
+                  getOptionValue={(option) => option.label}
                 />
-              </HorizontalFormBlockWrapper>
-            </div>
+              )}
+            />
+
+            <Controller
+              name="providerMechanical"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  label="Proveedor Mecánico"
+                  options={providers}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={
+                    typeof errors.descriptionFailure?.message === 'string'
+                      ? errors.descriptionFailure.message
+                      : undefined
+                  }
+                  getOptionValue={(option) => option.label}
+                />
+              )}
+            />
+
+            <Controller
+              name="state"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  label="Estado"
+                  options={[
+                    { value: 'true', label: 'Completado' },
+                    { value: 'false', label: 'Pendiente' },
+                  ]}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={
+                    typeof errors.descriptionFailure?.message === 'string'
+                      ? errors.descriptionFailure.message
+                      : undefined
+                  }
+                  getOptionValue={(option) => option.label}
+                />
+              )}
+            />
           </div>
 
-          <div
-            className={cn(
-              'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col',
-              isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
-            )}
-          >
-            <Button variant="outline" className="w-full @xl:w-auto">
-              Save as Draft
-            </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
-              className="w-full @xl:w-auto"
-            >
-              {id ? 'Update' : 'Create'} Category
+          <div className="flex justify-end gap-3">
+            <Button variant="outline">Cancelar</Button>
+            <Button type="submit" isLoading={isLoading}>
+              Guardar Cambios
             </Button>
           </div>
         </>

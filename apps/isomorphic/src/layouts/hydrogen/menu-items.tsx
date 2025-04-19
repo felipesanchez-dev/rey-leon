@@ -73,8 +73,8 @@ export const menuItems = [
     name: 'Inicio',
     href: '/',
     icon: <CiHome />,
-   },
-   
+  },
+
   {
     name: 'Opciones Administrador',
   },
@@ -92,28 +92,26 @@ export const menuItems = [
         name: 'Tarjetas de Roles',
         href: routes.widgets.cards,
         icon: <PiSquaresFourDuotone />,
-        },
-    ]
-    },
-    {
-      name: 'Gestionar Terceros',
-      href: '#',
-      icon: <FaUserShield />,
-      dropdownItems: [
-        {
-          name: 'Todos los clientes',
-          href: routes.jobBoard.dashboard,
-          icon: <PiShapesDuotone />,
-       },
-        {
-          name: 'Crear Contrato',
-        href: routes.appointment.appointmentList,
-          icon: <PiUsersThreeBold  />,
-        },
-        
-      ]
       },
-   
+    ],
+  },
+  {
+    name: 'Gestionar Terceros',
+    href: '#',
+    icon: <FaUserShield />,
+    dropdownItems: [
+      {
+        name: 'Todos los clientes',
+        href: routes.jobBoard.dashboard,
+        icon: <PiShapesDuotone />,
+      },
+      {
+        name: 'Crear Contrato',
+        href: routes.appointment.appointmentList,
+        icon: <PiUsersThreeBold />,
+      },
+    ],
+  },
 
   // {
   //   name: 'Appointment',
@@ -157,7 +155,7 @@ export const menuItems = [
   //   href: routes.socialMedia.dashboard,
   //   icon: <PiSparkleDuotone />,
   // },
-  // 
+  //
   // {
   //   name: 'Financial',
   //   href: routes.financial.dashboard,
@@ -205,17 +203,17 @@ export const menuItems = [
       //   href: routes.eCommerce.productDetails(DUMMY_ID),
       // },
       {
-       name: 'Crear nuevo vehículo',
-      href: routes.eCommerce.createProduct,
+        name: 'Crear nuevo vehículo',
+        href: routes.eCommerce.createProduct,
       },
       {
-      name: 'Editar vehiculo',
-      href: routes.eCommerce.products,
+        name: 'Editar vehiculo',
+        href: routes.eCommerce.products,
       },
-      // {
-      //   name: 'Categories',
-      //   href: routes.eCommerce.categories,
-      // },
+      {
+        name: 'Mantenimiento Preventivo',
+        href: routes.eCommerce.categories,
+      },
       // {
       //   name: 'Create Category',
       //   href: routes.eCommerce.createCategory,
@@ -336,7 +334,7 @@ export const menuItems = [
   //   href: routes.jobBoard.jobFeed,
   //   icon: <PiShapesDuotone />,
   // },
-  
+
   // {
   //   name: 'File Manager',
   //   href: routes.file.manager,

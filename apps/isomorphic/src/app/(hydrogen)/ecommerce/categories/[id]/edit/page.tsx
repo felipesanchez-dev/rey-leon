@@ -10,46 +10,42 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-/**
- * for dynamic metadata
- * @link: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
- */
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // read route params
   const id = (await params).id;
-
-  return metaObject(`Edit ${id}`);
+  return metaObject(`Edit Maintenance #${id}`);
 }
 
 const pageHeader = {
-  title: 'Edit Category',
+  title: 'Editar Mantenimiento Correctivo',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
-      name: 'Home',
+      name: 'Inicio',
     },
     {
       href: routes.eCommerce.categories,
-      name: 'Categories',
+      name: 'Mantenimientos',
     },
     {
-      name: 'Edit',
+      name: 'Editar',
     },
   ],
 };
 
-const categoryData = {
-  name: 'Vegetables',
-  slug: 'vegetables',
-  type: 'Diet Foods',
-  parentCategory: 'Grocery',
-  description: 'Incredible Granite Ball',
-  images: undefined,
+const maintenanceData = {
+  documentId: '',
+  descriptionFailure: '',
+  dateReport: '',
+  priority: '',
+  providerMechanical: '',
+  state: true,
+  name: '',
+  slug: '',
 };
 
-export default async function EditCategoryPage({ params }: any) {
+export default async function EditMaintenancePage({ params }: any) {
   const id = (await params).id;
+
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
@@ -58,11 +54,12 @@ export default async function EditCategoryPage({ params }: any) {
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         >
           <Button as="span" className="w-full @lg:w-auto" variant="outline">
-            Cancel
+            Cancelar
           </Button>
         </Link>
       </PageHeader>
-      <CreateCategory id={id} category={categoryData} />
+
+      <CreateCategory id={id} category={maintenanceData} />
     </>
   );
 }

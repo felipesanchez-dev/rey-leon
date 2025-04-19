@@ -12,9 +12,7 @@ function CreateCategoryModalView() {
   return (
     <div className="m-auto px-5 pb-8 pt-5 @lg:pt-6 @2xl:px-7">
       <div className="mb-7 flex items-center justify-between">
-        <Title as="h4" className="font-semibold">
-          Add Category
-        </Title>
+        <Title as="h4" className="font-semibold"></Title>
         <ActionIcon size="sm" variant="text" onClick={() => closeModal()}>
           <PiXBold className="h-auto w-5" />
         </ActionIcon>
@@ -50,7 +48,7 @@ export default function CategoryPageHeader({
           }
         >
           <PiPlusBold className="me-1 h-4 w-4" />
-          Add Category
+          Crear nuevo reporte
         </Button>
       </PageHeader>
     </>

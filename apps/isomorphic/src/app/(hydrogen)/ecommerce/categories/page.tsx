@@ -8,18 +8,18 @@ export const metadata = {
 };
 
 const pageHeader = {
-  title: 'Categories',
+  title: 'Programar Mantenimiento Preventivo',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
-      name: 'E-Commerce',
+      name: 'Mantenimiento Preventivo',
     },
     {
       href: routes.eCommerce.categories,
-      name: 'Categories',
+      name: 'Agendar',
     },
     {
-      name: 'List',
+      name: 'Lista de Mantenimientos programados',
     },
   ],
 };
