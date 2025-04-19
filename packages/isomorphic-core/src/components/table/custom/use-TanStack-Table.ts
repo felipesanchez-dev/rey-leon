@@ -38,16 +38,28 @@ export function useTanStackTable<T extends Record<string, any>>({
 }: {
   tableData: T[];
   options?: ExtendTableOptions<T>;
-  columnConfig: ColumnDef<T, any>[];
+  columnConfig: ColumnDef<T, any>[]; // array  ColumnDef
 }) {
   const [data, setData] = React.useState<T[]>([...tableData]);
-  const [columns] = React.useState(() => [...columnConfig]);
+
+  // CORRECCIÓN: columnConfig sea un array, no importa si es undefined o null
+  const [columns] = React.useState(() =>
+    Array.isArray(columnConfig) ? [...columnConfig] : []
+  );
+
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
-  const [columnOrder, setColumnOrder] = React.useState<string[]>(() => columns.map((c) => c.id!));
-  const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map(({ id }) => id), [data]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnOrder, setColumnOrder] = React.useState<string[]>(() =>
+    columns.map((c) => c.id!)
+  );
+  const dataIds = React.useMemo<UniqueIdentifier[]>(
+    () => data?.map(({ id }) => id),
+    [data]
+  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [rowPinning, setRowPinning] = React.useState<RowPinningState>({
     top: [],
     bottom: [],

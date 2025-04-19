@@ -8,12 +8,11 @@ import cn from "@core/utils/class-names";
 import DeletePopover from "../delete-popover";
 
 export default function TableRowActionGroup({
-
   onDelete,
   editUrl = "#",
   viewUrl = "#",
-  deletePopoverTitle = "Delete the appointment",
-  deletePopoverDescription = "Are you sure you want to delete this item?",
+  deletePopoverTitle = "Estas Seguro de Eliminar?",
+  deletePopoverDescription = "¿Estás seguro de que deseas eliminar este elemento?",
   className,
 }: {
   onDelete?: () => void;
@@ -28,16 +27,14 @@ export default function TableRowActionGroup({
       align="center"
       justify="end"
       gap="3"
-      className={cn("pe-3", className)}
-    >
+      className={cn("pe-3", className)}>
       <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
         <Link href={editUrl}>
           <ActionIcon
             as="span"
             size="sm"
             variant="outline"
-            aria-label="Edit Item"
-          >
+            aria-label="Edit Item">
             <PencilIcon className="size-4" />
           </ActionIcon>
         </Link>
@@ -48,8 +45,7 @@ export default function TableRowActionGroup({
             as="span"
             size="sm"
             variant="outline"
-            aria-label="View item"
-          >
+            aria-label="View item">
             <EyeIcon className="size-4" />
           </ActionIcon>
         </Link>
