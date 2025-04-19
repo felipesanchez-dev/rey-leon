@@ -5,7 +5,7 @@ import Sidebar from '@/layouts/hydrogen/sidebar';
 import Logo from '@core/components/logo';
 import HeaderMenuRight from '@/layouts/header-menu-right';
 import StickyHeader from '@/layouts/sticky-header';
-import SearchWidget from '@/app/shared/search/search';
+// import SearchWidget from '@/app/shared/search/search';
 
 export default function Header() {
   return (
@@ -22,7 +22,7 @@ export default function Header() {
           <Logo iconOnly={true} />
         </Link>
 
-        <SearchWidget />
+        {/* <SearchWidget /> */}
       </div>
 
       <HeaderMenuRight />
